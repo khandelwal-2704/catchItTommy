@@ -5,7 +5,7 @@ import time
 import serial #for Serial communication
 import struct
 
-arduino = serial.Serial('COM3',9600) #Create Serial port object called arduinoSerialData
+arduino = serial.Serial('/dev/ttyACM0',9600) #Create Serial port object called arduinoSerialData
 time.sleep(2) #wait for 2 secounds for the communication to get established
 
 def nothing(x):
@@ -59,7 +59,7 @@ while True:
 
 
 
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    mask, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
     if counter==0:
