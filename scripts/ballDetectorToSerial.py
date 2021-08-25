@@ -5,7 +5,9 @@ import time
 import serial #for Serial communication
 import struct
 
-arduino = serial.Serial('COM3',9600) #Create Serial port object called arduinoSerialData
+from serial.serialutil import Timeout
+
+arduino = serial.Serial('COM3',9600,timeout=1) #Create Serial port object called arduinoSerialData
 time.sleep(2) #wait for 2 secounds for the communication to get established
 
 def nothing(x):
@@ -43,9 +45,9 @@ while True:
 
     res = cv2.bitwise_and(frame, frame, mask=mask)
 
-    cv2.imshow("frame", frame)
-    cv2.imshow("mask", mask)
-    cv2.imshow("res", res)
+    #cv2.imshow("frame", frame)
+    #cv2.imshow("mask", mask)
+    #cv2.imshow("res", res)
     #print(res)
    # print(res.shape)
     #print(res.dtype)
@@ -75,10 +77,23 @@ while True:
 
     x,y,w,h = cv2.boundingRect(biggest_contour)
     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-    xcor=(x+(w/2))
-    
-    arduino.write( bytearray(struct.pack("f", xcor)))
-    print(arduino.write( bytearray(struct.pack("f", xcor)))) 
+    if arduino.isOpen():
+        # arduino.close()
+        # arduino.open()
+        #time.sleep(1)
+        xcor=(int((x+(w/2))))
+        v=str(0)
+        #bytes_xcor = xcor.to_bytes(2, 'big')
+        # print(xcor)
+       # print(bytes_xcor)
+        
+        arduino.write(bytes(v.encode()))
+        # print(b"abc"[0])
+        # time.sleep(0.1)
+        # arduino.write(bytes(v.encode()))
+        # arduino.flush()
+        
+       # serial_read = arduino.read(size=1) 
     #val=arduino.write(xcor)
     #print(b'1')
    # bin = struct.pack('f', xcor)
@@ -86,7 +101,7 @@ while True:
    # arduino.write(bin)
    # print(bin)
 
-    ycor=(y+(h/2))
+ #   ycor=(y+(h/2))
     #arduino.write(bytes(float(ycor)))
 
     
