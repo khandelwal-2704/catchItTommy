@@ -7,7 +7,7 @@ import struct
 
 from serial.serialutil import Timeout
 
-arduino = serial.Serial('COM3',9600,timeout=1) #Create Serial port object called arduinoSerialData
+arduino = serial.Serial('/dev/ttyACM0',9600) #Create Serial port object called arduinoSerialData
 time.sleep(2) #wait for 2 secounds for the communication to get established
 
 def nothing(x):
@@ -61,7 +61,7 @@ while True:
 
 
 
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    mask, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
     if counter==0:
@@ -81,13 +81,15 @@ while True:
         # arduino.close()
         # arduino.open()
         #time.sleep(1)
-        xcor=(int((x+(w/2))))
-        v=str(0)
+        xcor=str(((x+(w/2))))
+#        v=300
         #bytes_xcor = xcor.to_bytes(2, 'big')
         # print(xcor)
-       # print(bytes_xcor)
+        print(xcor)
         
-        arduino.write(bytes(v.encode()))
+#        arduino.write(bytes(xcor,'utf-8'))
+        arduino.write(bytes(xcor.encode('utf-8')))
+        time.sleep(1)
         # print(b"abc"[0])
         # time.sleep(0.1)
         # arduino.write(bytes(v.encode()))
@@ -113,7 +115,7 @@ while True:
     #cv2.drawContours(frame, [cnt], 0, (0,255,0), 3)
 
     # Show final output image
-    cv2.imshow('colorTest', frame)
+    cv2.imshow('colorTest', mask)
 	
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
