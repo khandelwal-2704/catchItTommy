@@ -5,18 +5,16 @@ void setup() {
   // put your setup code here, to run once:
 
 }
-float data;
+int data;
 void loop() {
   // put your main code here, to run repeatedly:
-  while(Serial.available()>0)
-  {
-     data = Serial.parseInt();
-  }
-  if(data > 240.0)
+  while(!Serial.available());
+  data = Serial.readString().toInt();
+  if(data > 240)
   {
     digitalWrite(LED_BUILTIN, HIGH);
   }
-  else if (data < 240.0)
+  else if (data < 240)
   {
     digitalWrite(LED_BUILTIN, LOW);
   }
