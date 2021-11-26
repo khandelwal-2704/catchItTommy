@@ -5,7 +5,9 @@ import time
 import serial #for Serial communication
 import struct
 
-arduino = serial.Serial('COM3',9600) #Create Serial port object called arduinoSerialData
+from serial.serialutil import Timeout
+
+arduino = serial.Serial('/dev/ttyACM0',9600) #Create Serial port object called arduinoSerialData
 time.sleep(2) #wait for 2 secounds for the communication to get established
 
 def nothing(x):
@@ -22,7 +24,6 @@ cv2.createTrackbar("US", "Tracking", 255, 255, nothing)
 cv2.createTrackbar("UV", "Tracking", 255, 255, nothing)
 counter=0
 while True:
-    #frame = cv2.imread('smarties.png')
     timeCheck = time.time()
     _, frame = cap.read()
 
@@ -36,22 +37,24 @@ while True:
     u_s = cv2.getTrackbarPos("US", "Tracking")
     u_v = cv2.getTrackbarPos("UV", "Tracking")
 
-    l_b = np.array([0, 90, 113])
-    u_b = np.array([90, 255, 255])
+#   l_b = np.array([l_h, l_s, l_v])
+#   l_b = np.array([0, 90, 113])
+    l_b = np.array([0, 0, 14])
+#   u_b = np.array([u_h, u_s, u_v])
+#   u_b = np.array([90, 255, 255])
+    u_b = np.array([162, 103, 150])
 
     mask = cv2.inRange(hsv, l_b, u_b)
 
     res = cv2.bitwise_and(frame, frame, mask=mask)
 
-    cv2.imshow("frame", frame)
-    cv2.imshow("mask", mask)
-    cv2.imshow("res", res)
+    #cv2.imshow("frame", frame)
+    #cv2.imshow("mask", mask)
+    #cv2.imshow("res", res)
     #print(res)
    # print(res.shape)
     #print(res.dtype)
     #print(mask[240,320])
-
-
 
     #key = cv2.waitKey(1)
     #if key == 27:
@@ -59,7 +62,7 @@ while True:
 
 
 
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    mask, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
     if counter==0:
@@ -75,25 +78,19 @@ while True:
 
     x,y,w,h = cv2.boundingRect(biggest_contour)
     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-    xcor=(x+(w/2))
-    
-    arduino.write( bytearray(struct.pack("f", xcor)))
-    print(arduino.write( bytearray(struct.pack("f", xcor)))) 
-    #val=arduino.write(xcor)
-    #print(b'1')
-   # bin = struct.pack('f', xcor)
-    #for b in bin:
-   # arduino.write(bin)
-   # print(bin)
+    if arduino.isOpen():
+        xcor=str(((x+(w/2))))
+        ycor=str(((y+(h/2))))
+        pos = xcor + "\n"
+        pos = pos + ycor
+        print(pos)
+        
+#       arduino.write(bytes(xcor,'utf-8')) for python3
+        arduino.write(bytes(pos.encode('utf-8')))
+        time.sleep(1) #try to make work with lower sleep time
 
-    ycor=(y+(h/2))
-    #arduino.write(bytes(float(ycor)))
-
-    
     #cv2.drawContours(frame, contours, -1, (0,255,0), 3)
-    
     #cv2.drawContours(frame, contours, 3, (0,255,0), 3)
-    
     #cnt = contours[1]
     #cv2.drawContours(frame, [cnt], 0, (0,255,0), 3)
 

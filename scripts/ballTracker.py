@@ -55,7 +55,7 @@ while True:
 
 
 
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    mask, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
     if counter==0:
@@ -71,7 +71,7 @@ while True:
 
     x,y,w,h = cv2.boundingRect(biggest_contour)
     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-    print(x+(w/2),end="      ")
+    print(x+(w/2)),
     print(y+(h/2))
 
     
