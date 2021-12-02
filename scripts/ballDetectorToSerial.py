@@ -7,7 +7,7 @@ import struct
 
 from serial.serialutil import Timeout
 
-arduino = serial.Serial('/dev/ttyACM0',9600) #Create Serial port object called arduinoSerialData
+arduino = serial.Serial('/dev/ttyACM0',115200) #Create Serial port object called arduinoSerialData
 time.sleep(2) #wait for 2 secounds for the communication to get established
 
 def nothing(x):
@@ -23,6 +23,9 @@ cv2.createTrackbar("UH", "Tracking", 255, 255, nothing)
 cv2.createTrackbar("US", "Tracking", 255, 255, nothing)
 cv2.createTrackbar("UV", "Tracking", 255, 255, nothing)
 counter=0
+separator = ","
+start = "<"
+end = ">"
 while True:
     timeCheck = time.time()
     _, frame = cap.read()
@@ -37,12 +40,12 @@ while True:
     u_s = cv2.getTrackbarPos("US", "Tracking")
     u_v = cv2.getTrackbarPos("UV", "Tracking")
 
-#   l_b = np.array([l_h, l_s, l_v])
-#   l_b = np.array([0, 90, 113])
-    l_b = np.array([0, 0, 14])
-#   u_b = np.array([u_h, u_s, u_v])
-#   u_b = np.array([90, 255, 255])
-    u_b = np.array([162, 103, 150])
+#    l_b = np.array([l_h, l_s, l_v])
+#    l_b = np.array([0, 90, 113])
+    l_b = np.array([0, 0, 0]) #v=0 means black
+#    u_b = np.array([u_h, u_s, u_v])
+#    u_b = np.array([90, 255, 255])
+    u_b = np.array([180, 255, 50])
 
     mask = cv2.inRange(hsv, l_b, u_b)
 
@@ -81,13 +84,14 @@ while True:
     if arduino.isOpen():
         xcor=str(((x+(w/2))))
         ycor=str(((y+(h/2))))
-        pos = xcor + "\n"
-        pos = pos + ycor
-        print(pos)
+        pos = start + xcor + separator + ycor + end
+#        print("x =",xcor)
+#        print("y =",ycor)
+#        print("pos =",pos)
         
 #       arduino.write(bytes(xcor,'utf-8')) for python3
         arduino.write(bytes(pos.encode('utf-8')))
-        time.sleep(1) #try to make work with lower sleep time
+#        time.sleep(0.5) #try to make work with lower sleep time
 
     #cv2.drawContours(frame, contours, -1, (0,255,0), 3)
     #cv2.drawContours(frame, contours, 3, (0,255,0), 3)
